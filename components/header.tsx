@@ -1,29 +1,77 @@
-import Link from 'next/link'
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+'use client';
 
-import { ThemeToggle } from '@/components/theme-toggle'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link';
+import { useState } from 'react';
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { Menu } from 'lucide-react';
+
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className='py-4'>
       <nav className='container flex items-center justify-between'>
-        <ul className='flex gap-10 text-sm font-medium'>
-          <li>
-            <Link href='/'>Home</Link>
-          </li>
-          <li>
-            <Link href='/protected/server'>Protected (server)</Link>
-          </li>
-          <li>
-            <Link href='/protected/client'>Protected (client)</Link>
-          </li>
-          <li>
-            <Link href='/api/me'>Who am I?</Link>
-          </li>
-        </ul>
+        {/* Left side: Menu items or Hamburger icon */}
+        <div className='flex items-center'>
+          <ul className='hidden lg:flex gap-10 text-sm font-medium'>
+            <li>
+              <Link href='/'>Home</Link>
+            </li>
+            <li>
+              <Link href='/protected/server'>Protected (server)</Link>
+            </li>
+            <li>
+              <Link href='/protected/client'>Protected (client)</Link>
+            </li>
+            <li>
+              <Link href='/api/me'>Who am I?</Link>
+            </li>
+          </ul>
 
-        <div className='flex items-center justify-between gap-6'>
+          {/* Hamburger Icon for smaller screens */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='outline'
+                size='icon'
+                className='lg:hidden'
+                onClick={toggleMenu}
+              >
+                <Menu className='h-5 w-5' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='start'>
+              <DropdownMenuItem asChild>
+                <Link href='/' onClick={toggleMenu}>Home</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href='/protected/server' onClick={toggleMenu}>Protected (server)</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href='/protected/client' onClick={toggleMenu}>Protected (client)</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href='/api/me' onClick={toggleMenu}>Who am I?</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Right side: ThemeToggle and User/Sign-in button */}
+        <div className='flex items-center gap-6'>
           <ThemeToggle />
 
           <SignedOut>
@@ -37,5 +85,5 @@ export default function Header() {
         </div>
       </nav>
     </header>
-  )
+  );
 }

@@ -76,7 +76,7 @@ export default function Home() {
         <h2 className='text-2xl font-bold mt-8'>🖥️ Usage</h2>
         <ol className='list-decimal list-inside ml-4'>
           <li>Enter your message in the chat input field.</li>
-          <li>Press "Send" or hit Enter to submit your message.</li>
+          <li>Press &quot;Send&quot; or hit Enter to submit your message.</li>
           <li>The AI will process your input and provide a response.</li>
           <li>Continue the conversation as desired.</li>
         </ol>

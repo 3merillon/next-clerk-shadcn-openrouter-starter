@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef, useCallback } from 'react';
 import throttle from 'lodash/throttle';
 import { useChatbot } from './chatbot-context';
 import { Button } from '@/components/ui/button';
@@ -58,13 +58,13 @@ export default function Chatbot() {
     }
   };
 
-  const handleMouseMove = throttle((e: MouseEvent) => {
+  const handleMouseMove = useCallback(throttle((e: MouseEvent) => {
     if (!isResizing) return;
     const newHeight = window.innerHeight - e.clientY - 16;
     if (newHeight > 112 && newHeight < window.innerHeight - 100) {
       setWidgetHeight(newHeight);
     }
-  }, 50);
+  }, 50), [isResizing, setWidgetHeight]);
 
   const handleMouseUp = () => {
     setIsResizing(false);
@@ -87,7 +87,7 @@ export default function Chatbot() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isResizing]);
+  }, [isResizing, handleMouseMove]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

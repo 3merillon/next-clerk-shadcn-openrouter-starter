@@ -96,7 +96,7 @@ This project is MIT licensed.
 
 ## 📄 Demo
 
-Check out the live demo: [Demo Link](https://your-demo-link.vercel.app)
+Check out the live demo: [Demo Link](https://next-clerk-template.vercel.app)
 
 ---
 

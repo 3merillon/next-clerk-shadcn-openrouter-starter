@@ -109,7 +109,7 @@ export default function Home() {
         </ul>
         
         <h2 className='text-2xl font-bold mt-8'>📄 Demo</h2>
-        <p>Check out the live demo: <a href="https://your-demo-link.vercel.app" className='text-blue-500'>Demo Link</a></p>
+        <p>Check out the live demo: <a href="https://next-clerk-template.vercel.app" className='text-blue-500'>Demo Link</a></p>
 
         <h2 className='text-2xl font-bold mt-8'>🙏 Special Thanks</h2>
         <p>A heartfelt thank you to Sharon for her incredible work on the <a href="https://github.com/sherrybabe1978/openrouter-llm-integration" className='text-blue-500'>OpenRouter LLM Integration</a>. Your contributions have been invaluable to this project!</p>

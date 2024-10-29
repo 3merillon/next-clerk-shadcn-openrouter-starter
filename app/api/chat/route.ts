@@ -18,6 +18,7 @@ interface ChatResponse {
 
 const API_URL = process.env.OPENROUTER_API_URL || "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.2-3b-instruct:free";
+const SYSTEM_MESSAGE = process.env.SYSTEM_MESSAGE || "Default system message";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,10 @@ export async function POST(req: NextRequest) {
     }
 
     const chatRequest: ChatRequest = {
-      messages: [{ role: "user", content: message }],
+      messages: [
+        { role: "system", content: SYSTEM_MESSAGE },
+        { role: "user", content: message }
+      ],
       model: MODEL,
     };
 

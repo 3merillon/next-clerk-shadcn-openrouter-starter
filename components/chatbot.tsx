@@ -58,9 +58,26 @@ export default function Chatbot() {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsResizing(true);
+    document.body.style.userSelect = 'none';
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
+    }
+  };
+
   const handleMouseMove = useCallback(throttle((e: MouseEvent) => {
     if (!isResizing) return;
     const newHeight = window.innerHeight - e.clientY - 16;
+    if (newHeight > 112 && newHeight < window.innerHeight - 100) {
+      setWidgetHeight(newHeight);
+    }
+  }, 50), [isResizing, setWidgetHeight]);
+
+  const handleTouchMove = useCallback(throttle((e: TouchEvent) => {
+    if (!isResizing) return;
+    const touch = e.touches[0];
+    const newHeight = window.innerHeight - touch.clientY - 16;
     if (newHeight > 112 && newHeight < window.innerHeight - 100) {
       setWidgetHeight(newHeight);
     }
@@ -74,20 +91,34 @@ export default function Chatbot() {
     }
   };
 
+  const handleTouchEnd = () => {
+    setIsResizing(false);
+    document.body.style.userSelect = '';
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
+    }
+  };
+
   useLayoutEffect(() => {
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
     } else {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isResizing, handleMouseMove]);
+  }, [isResizing, handleMouseMove, handleTouchMove]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,6 +186,7 @@ export default function Chatbot() {
         <div
           className="absolute top-1 left-1/3 right-1/3 h-5 bg-background border cursor-row-resize transform -translate-y-6 rounded-t-lg flex justify-center items-center"
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
         >
           <div className="grid grid-cols-3 grid-rows-2 gap-1">
             <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>

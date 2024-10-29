@@ -196,10 +196,9 @@ export default function Chatbot() {
       style={{ height: isCollapsed ? '58px' : `${Math.min(widgetHeight, maxHeight)}px` }}
     >
       <Button
-        variant="outline"
         size="icon"
         onClick={toggleCollapse}
-        className="absolute top-2 left-2 z-10 rounded-full bg-orange-600 text-white hover:bg-orange-700"
+        className="absolute top-2 left-2 z-10 rounded-full text-white"
       >
         {isCollapsed ? <ChevronUp /> : <ChevronDown />}
       </Button>

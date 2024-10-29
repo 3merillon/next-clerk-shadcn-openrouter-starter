@@ -21,7 +21,7 @@ export default function Chatbot() {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   };
-
+  
   useLayoutEffect(() => {
     const savedScrollPosition = localStorage.getItem('chatbotScrollPosition');
     if (savedScrollPosition && scrollAreaRef.current) {
@@ -43,7 +43,7 @@ export default function Chatbot() {
         const scrollPosition = scrollAreaRef.current.scrollTop.toString();
         localStorage.setItem('chatbotScrollPosition', scrollPosition);
       }
-    }, 100);
+    }, 32);
 
     const scrollArea = scrollAreaRef.current;
     scrollArea?.addEventListener('scroll', handleScroll);
@@ -53,6 +53,7 @@ export default function Chatbot() {
   const handleMouseDown = () => {
     setIsResizing(true);
     document.body.style.userSelect = 'none';
+    document.body.style.overflow = 'hidden'; // Disable background scroll
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -61,6 +62,7 @@ export default function Chatbot() {
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsResizing(true);
     document.body.style.userSelect = 'none';
+    document.body.style.overflow = 'hidden'; // Disable background scroll
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -69,7 +71,8 @@ export default function Chatbot() {
   const handleMouseMove = useCallback(throttle((e: MouseEvent) => {
     if (!isResizing) return;
     const newHeight = window.innerHeight - e.clientY - 16;
-    if (newHeight > 112 && newHeight < window.innerHeight - 100) {
+    const maxHeight = window.innerHeight - 100; // Adjust as needed
+    if (newHeight > 112 && newHeight < maxHeight) {
       setWidgetHeight(newHeight);
     }
   }, 50), [isResizing, setWidgetHeight]);
@@ -78,7 +81,8 @@ export default function Chatbot() {
     if (!isResizing) return;
     const touch = e.touches[0];
     const newHeight = window.innerHeight - touch.clientY - 16;
-    if (newHeight > 112 && newHeight < window.innerHeight - 100) {
+    const maxHeight = window.innerHeight - 100; // Adjust as needed
+    if (newHeight > 112 && newHeight < maxHeight) {
       setWidgetHeight(newHeight);
     }
   }, 50), [isResizing, setWidgetHeight]);
@@ -86,6 +90,7 @@ export default function Chatbot() {
   const handleMouseUp = () => {
     setIsResizing(false);
     document.body.style.userSelect = '';
+    document.body.style.overflow = ''; // Enable background scroll
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
@@ -94,6 +99,7 @@ export default function Chatbot() {
   const handleTouchEnd = () => {
     setIsResizing(false);
     document.body.style.userSelect = '';
+    document.body.style.overflow = ''; // Enable background scroll
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
@@ -167,12 +173,15 @@ export default function Chatbot() {
     setIsCollapsed(!isCollapsed);
   };
 
+  // Calculate max height based on screen size and header height
+  const maxHeight = window.innerHeight - 100; // Adjust header height as needed
+
   return (
     <div
       className={`fixed bottom-4 right-4 w-80 bg-background text-foreground border border-muted-background rounded-lg flex flex-col transition-all ease-in-out ${
         isCollapsed ? 'h-[58px]' : ''
       }`}
-      style={{ height: isCollapsed ? '58px' : `${widgetHeight}px` }}
+      style={{ height: isCollapsed ? '58px' : `${Math.min(widgetHeight, maxHeight)}px` }}
     >
       <Button
         variant="outline"

@@ -31,10 +31,10 @@ export default function Header() {
               <Link href='/'>Home</Link>
             </li>
             <li>
-              <Link href='/protected/server'>Protected (server)</Link>
+              <Link href='/protected/client'>Protected (client)</Link>
             </li>
             <li>
-              <Link href='/protected/client'>Protected (client)</Link>
+              <Link href='/protected/server'>Protected (server)</Link>
             </li>
             <li>
               <Link href='/api/me'>Who am I?</Link>

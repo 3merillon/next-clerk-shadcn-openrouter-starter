@@ -29,7 +29,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button onClick={toggleTheme} variant='outline' size='icon'>
+    <Button onClick={toggleTheme} variant='outline' size='icon' className='rounded-full'>
       {theme === 'light' ? (
         <Sun className='h-[1.2rem] w-[1.2rem] transition-all' />
       ) : (

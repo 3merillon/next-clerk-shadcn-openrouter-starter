@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ChatbotProvider } from '@/components/chatbot-context'; // Import ChatbotProvider
 
 import './globals.css';
 
@@ -35,9 +36,11 @@ export default function RootLayout({
       >
         <body className={`flex min-h-screen flex-col ${inter.className}`}>
           <ThemeProvider>
-            <Header />
-            <main className='grow'>{children}</main>
-            <Footer />
+            <ChatbotProvider> {/* Wrap with ChatbotProvider */}
+              <Header />
+              <main className='grow'>{children}</main>
+              <Footer />
+            </ChatbotProvider>
           </ThemeProvider>
         </body>
       </html>

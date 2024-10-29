@@ -22,7 +22,7 @@ export default function Header() {
   };
 
   return (
-    <header className='py-4'>
+    <header className='py-4 fixed w-full bg-ccbg backdrop-blur-md border-b border-orange-500 border-dashed'>
       <nav className='container flex items-center justify-between'>
         {/* Left side: Menu items or Hamburger icon */}
         <div className='flex items-center'>
@@ -76,7 +76,7 @@ export default function Header() {
 
           <SignedOut>
             <SignInButton mode='modal'>
-              <Button size='sm'>Sign in</Button>
+              <Button size='sm' className='rounded-full'>Sign in</Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>

@@ -50,10 +50,23 @@ export default function Chatbot() {
     return () => scrollArea?.removeEventListener('scroll', handleScroll);
   }, [initialRender]);
 
+  // New useLayoutEffect for window resize handling
+  useLayoutEffect(() => {
+    const updateMaxHeight = throttle(() => {
+      const newMaxHeight = window.innerHeight - 116; // 100px + 16px (bottom-4)
+      if (widgetHeight > newMaxHeight) {
+        setWidgetHeight(newMaxHeight);
+      }
+    }, 100);
+
+    window.addEventListener('resize', updateMaxHeight);
+    return () => window.removeEventListener('resize', updateMaxHeight);
+  }, [widgetHeight, setWidgetHeight]);
+
   const handleMouseDown = () => {
     setIsResizing(true);
     document.body.style.userSelect = 'none';
-    document.body.style.overflow = 'hidden'; // Disable background scroll
+    document.body.style.overflow = 'hidden';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -62,7 +75,7 @@ export default function Chatbot() {
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsResizing(true);
     document.body.style.userSelect = 'none';
-    document.body.style.overflow = 'hidden'; // Disable background scroll
+    document.body.style.overflow = 'hidden';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -70,8 +83,8 @@ export default function Chatbot() {
 
   const handleMouseMove = useCallback(throttle((e: MouseEvent) => {
     if (!isResizing) return;
-    const newHeight = window.innerHeight - e.clientY - 16;
-    const maxHeight = window.innerHeight - 100; // Adjust as needed
+    const newHeight = window.innerHeight - e.clientY - 32; // Changed from 16 to 32
+    const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
     if (newHeight > 112 && newHeight < maxHeight) {
       setWidgetHeight(newHeight);
     }
@@ -80,8 +93,8 @@ export default function Chatbot() {
   const handleTouchMove = useCallback(throttle((e: TouchEvent) => {
     if (!isResizing) return;
     const touch = e.touches[0];
-    const newHeight = window.innerHeight - touch.clientY - 16;
-    const maxHeight = window.innerHeight - 100; // Adjust as needed
+    const newHeight = window.innerHeight - touch.clientY - 32; // Changed from 16 to 32
+    const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
     if (newHeight > 112 && newHeight < maxHeight) {
       setWidgetHeight(newHeight);
     }
@@ -90,7 +103,7 @@ export default function Chatbot() {
   const handleMouseUp = () => {
     setIsResizing(false);
     document.body.style.userSelect = '';
-    document.body.style.overflow = ''; // Enable background scroll
+    document.body.style.overflow = '';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
@@ -99,7 +112,7 @@ export default function Chatbot() {
   const handleTouchEnd = () => {
     setIsResizing(false);
     document.body.style.userSelect = '';
-    document.body.style.overflow = ''; // Enable background scroll
+    document.body.style.overflow = '';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
@@ -173,8 +186,7 @@ export default function Chatbot() {
     setIsCollapsed(!isCollapsed);
   };
 
-  // Calculate max height based on screen size and header height
-  const maxHeight = window.innerHeight - 100; // Adjust header height as needed
+  const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
 
   return (
     <div
@@ -187,7 +199,7 @@ export default function Chatbot() {
         variant="outline"
         size="icon"
         onClick={toggleCollapse}
-        className="absolute top-2 left-2 z-10 rounded-full hover:bg-orange-500 hover:text-white"
+        className="absolute top-2 left-2 z-10 rounded-full bg-orange-600 text-white hover:bg-orange-700"
       >
         {isCollapsed ? <ChevronUp /> : <ChevronDown />}
       </Button>

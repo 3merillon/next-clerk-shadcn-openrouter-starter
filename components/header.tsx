@@ -58,10 +58,10 @@ export default function Header() {
                 <Link href='/' onClick={toggleMenu}>Home</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href='/protected/server' onClick={toggleMenu}>Protected (server)</Link>
+                <Link href='/protected/client' onClick={toggleMenu}>Protected (client)</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href='/protected/client' onClick={toggleMenu}>Protected (client)</Link>
+                <Link href='/protected/server' onClick={toggleMenu}>Protected (server)</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href='/api/me' onClick={toggleMenu}>Who am I?</Link>

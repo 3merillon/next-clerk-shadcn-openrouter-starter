@@ -169,7 +169,7 @@ export default function Chatbot() {
   };
 
   const getMessageClassNames = (role: string) => {
-    const baseClass = 'inline-block p-3 border-2 border-dotted max-w-[88%] text-left flex items-start relative';
+    const baseClass = 'inline-block p-3 border-2 border-dotted max-w-[88%] text-left flex items-start relative break-all whitespace-pre-wrap overflow-hidden';
     switch (role) {
       case 'user':
         return `${baseClass} rounded-l-lg border-orange-500 border-r-0 ml-2`;
@@ -225,14 +225,27 @@ export default function Chatbot() {
             isCollapsed ? 'h-0 opacity-0 overflow-hidden' : 'h-full opacity-100 overflow-y-auto'
           }`}
           ref={scrollAreaRef}
+          style={{ maxWidth: '100%' }}
         >
-          <div className="p-0">
+          <div className="p-0 max-w-full">
             {messages.map((msg, index) => (
               <div key={index} className={`flex items-start mb-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`relative flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <span className={getMessageClassNames(msg.role)}>
-                    <div className={`absolute ${msg.role === 'user' ? 'right-0' : 'left-0'} w-8 h-8 rounded-full overflow-hidden`} style={{ margin: '3px' }}></div>
-                    <span className={`flex-grow ${msg.role === 'user' ? 'order-1' : ''}`} style={{ textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+                    <div 
+                      className={`absolute ${msg.role === 'user' ? 'right-0' : 'left-0'} w-8 h-8 rounded-full overflow-hidden`} 
+                      style={{ margin: '3px' }}
+                    ></div>
+                    <span 
+                      className={`flex-grow ${msg.role === 'user' ? 'order-1' : ''} overflow-hidden break-words whitespace-pre-wrap`} 
+                      style={{ 
+                        textAlign: msg.role === 'user' ? 'right' : 'left',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                        minWidth: 0,
+                        maxWidth: '100%'
+                      }}
+                    >
                       {msg.content}
                     </span>
                   </span>

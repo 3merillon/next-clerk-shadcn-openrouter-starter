@@ -22,7 +22,7 @@ export default function Header() {
   };
 
   return (
-    <header className='py-4 fixed w-full bg-ccbg backdrop-blur-md border-b border-orange-500 border-dashed'>
+    <header className='py-4 fixed w-full bg-ccbg backdrop-blur-md border-b border-orange-500 border-dashed z-50'>
       <nav className='container flex items-center justify-between'>
         {/* Left side: Menu items or Hamburger icon */}
         <div className='flex items-center'>

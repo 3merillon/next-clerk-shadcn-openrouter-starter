@@ -86,6 +86,8 @@ export default function Chatbot() {
     setIsResizing(true);
     setDisableTransition(true);
     document.body.style.userSelect = 'none';
+    document.body.style.overflow = 'hidden';
+    e.preventDefault();
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -118,13 +120,13 @@ export default function Chatbot() {
       }
       isThrottled.current = false;
     }, 10);
+    e.preventDefault();
   }, [isResizing, setWidgetHeight]);
 
   const handleMouseUp = useCallback(() => {
     setIsResizing(false);
     setDisableTransition(false);
     document.body.style.userSelect = '';
-    document.body.style.overflow = '';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
@@ -146,7 +148,7 @@ export default function Chatbot() {
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
       document.addEventListener('touchend', handleTouchEnd);
     } else {
       document.removeEventListener('mousemove', handleMouseMove);

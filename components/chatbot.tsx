@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useLayoutEffect, useRef, useCallback } from 'react';
-import throttle from 'lodash/throttle';
 import { useChatbot } from './chatbot-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,11 @@ export default function Chatbot() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [initialRender, setInitialRender] = useState(true);
+  const [disableTransition, setDisableTransition] = useState(false);
   const previousMessagesLength = useRef(messages.length);
+  const isThrottled = useRef(false);
+
+  const isBrowser = typeof window !== 'undefined';
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -23,50 +26,57 @@ export default function Chatbot() {
   };
   
   useLayoutEffect(() => {
+    if (!isBrowser) return;
+
     const savedScrollPosition = localStorage.getItem('chatbotScrollPosition');
     if (savedScrollPosition && scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = Number(savedScrollPosition);
     }
     setInitialRender(false);
-  }, []);
+  }, [isBrowser]);
 
   useLayoutEffect(() => {
+    if (!isBrowser) return;
+
     if (messages.length > previousMessagesLength.current) {
       scrollToBottom();
     }
     previousMessagesLength.current = messages.length;
-  }, [messages]);
+  }, [messages, isBrowser]);
 
   useLayoutEffect(() => {
-    const handleScroll = throttle(() => {
+    if (!isBrowser) return;
+
+    const handleScroll = () => {
       if (scrollAreaRef.current && !initialRender) {
         const scrollPosition = scrollAreaRef.current.scrollTop.toString();
         localStorage.setItem('chatbotScrollPosition', scrollPosition);
       }
-    }, 32);
+    };
 
     const scrollArea = scrollAreaRef.current;
     scrollArea?.addEventListener('scroll', handleScroll);
     return () => scrollArea?.removeEventListener('scroll', handleScroll);
-  }, [initialRender]);
+  }, [initialRender, isBrowser]);
 
-  // New useLayoutEffect for window resize handling
   useLayoutEffect(() => {
-    const updateMaxHeight = throttle(() => {
-      const newMaxHeight = window.innerHeight - 116; // 100px + 16px (bottom-4)
+    if (!isBrowser) return;
+
+    const updateMaxHeight = () => {
+      const newMaxHeight = window.innerHeight - 116;
       if (widgetHeight > newMaxHeight) {
         setWidgetHeight(newMaxHeight);
       }
-    }, 100);
+    };
 
     window.addEventListener('resize', updateMaxHeight);
     return () => window.removeEventListener('resize', updateMaxHeight);
-  }, [widgetHeight, setWidgetHeight]);
+  }, [widgetHeight, setWidgetHeight, isBrowser]);
 
   const handleMouseDown = () => {
     setIsResizing(true);
+    setDisableTransition(true);
     document.body.style.userSelect = 'none';
-    document.body.style.overflow = 'hidden';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
@@ -74,51 +84,65 @@ export default function Chatbot() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsResizing(true);
+    setDisableTransition(true);
     document.body.style.userSelect = 'none';
-    document.body.style.overflow = 'hidden';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.add('no-scrollbars');
     }
   };
 
-  const handleMouseMove = useCallback(throttle((e: MouseEvent) => {
-    if (!isResizing) return;
-    const newHeight = window.innerHeight - e.clientY - 32; // Changed from 16 to 32
-    const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
-    if (newHeight > 112 && newHeight < maxHeight) {
-      setWidgetHeight(newHeight);
-    }
-  }, 50), [isResizing, setWidgetHeight]);
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing || isThrottled.current) return;
 
-  const handleTouchMove = useCallback(throttle((e: TouchEvent) => {
-    if (!isResizing) return;
-    const touch = e.touches[0];
-    const newHeight = window.innerHeight - touch.clientY - 32; // Changed from 16 to 32
-    const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
-    if (newHeight > 112 && newHeight < maxHeight) {
-      setWidgetHeight(newHeight);
-    }
-  }, 50), [isResizing, setWidgetHeight]);
+    isThrottled.current = true;
+    setTimeout(() => {
+      const newHeight = window.innerHeight - e.clientY - 32;
+      const maxHeight = window.innerHeight - 116;
+      if (newHeight > 112 && newHeight < maxHeight) {
+        setWidgetHeight(newHeight);
+      }
+      isThrottled.current = false;
+    }, 10);
+  }, [isResizing, setWidgetHeight]);
 
-  const handleMouseUp = () => {
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isResizing || isThrottled.current) return;
+
+    isThrottled.current = true;
+    setTimeout(() => {
+      const touch = e.touches[0];
+      const newHeight = window.innerHeight - touch.clientY - 32;
+      const maxHeight = window.innerHeight - 116;
+      if (newHeight > 112 && newHeight < maxHeight) {
+        setWidgetHeight(newHeight);
+      }
+      isThrottled.current = false;
+    }, 10);
+  }, [isResizing, setWidgetHeight]);
+
+  const handleMouseUp = useCallback(() => {
     setIsResizing(false);
+    setDisableTransition(false);
     document.body.style.userSelect = '';
     document.body.style.overflow = '';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
-  };
+  }, []);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     setIsResizing(false);
+    setDisableTransition(false);
     document.body.style.userSelect = '';
     document.body.style.overflow = '';
     if (scrollAreaRef.current) {
       scrollAreaRef.current.parentElement?.classList.remove('no-scrollbars');
     }
-  };
+  }, []);
 
   useLayoutEffect(() => {
+    if (!isBrowser) return;
+
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
@@ -137,7 +161,7 @@ export default function Chatbot() {
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isResizing, handleMouseMove, handleTouchMove]);
+  }, [isResizing, handleMouseMove, handleTouchMove, handleMouseUp, handleTouchEnd, isBrowser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,7 +196,7 @@ export default function Chatbot() {
     const baseClass = 'inline-block p-3 border-2 border-dotted max-w-[88%] text-left flex items-start relative break-all whitespace-pre-wrap overflow-hidden';
     switch (role) {
       case 'user':
-        return `${baseClass} rounded-l-lg border-orange-500 border-r-0 ml-2`;
+        return `${baseClass} rounded-l-lg border-orange-500 border-r-0 ml-2 max-w-full text-right`;
       case 'ai':
         return `${baseClass} rounded-r-lg border-sky-500 border-l-0 mr-2`;
       case 'system':
@@ -186,11 +210,13 @@ export default function Chatbot() {
     setIsCollapsed(!isCollapsed);
   };
 
-  const maxHeight = window.innerHeight - 116; // Changed from 100 to 116
+  const maxHeight = isBrowser ? window.innerHeight - 116 : 0;
 
   return (
     <div
-      className={`fixed bottom-4 right-4 w-80 bg-background text-foreground border border-muted-background rounded-lg flex flex-col transition-all ease-in-out ${
+      className={`fixed bottom-4 right-4 w-80 bg-background text-foreground border border-muted-background rounded-lg flex flex-col ${
+        disableTransition ? '' : 'transition-all ease-in-out'
+      } ${
         isCollapsed ? 'h-[58px]' : ''
       }`}
       style={{ height: isCollapsed ? '58px' : `${Math.min(widgetHeight, maxHeight)}px` }}
@@ -220,7 +246,7 @@ export default function Chatbot() {
       )}
       <div className="relative flex-grow overflow-hidden">
         <ScrollArea
-          className={`border-b border-foreground flex-grow p-0 transition-all ease-in-out ${
+          className={`border-b border-foreground flex-grow p-0 ${
             isCollapsed ? 'h-0 opacity-0 overflow-hidden' : 'h-full opacity-100 overflow-y-auto'
           }`}
           ref={scrollAreaRef}

@@ -11,7 +11,6 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const { messages, isCollapsed, setIsCollapsed, widgetHeight, setWidgetHeight, addMessage } = useChatbot();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [initialRender, setInitialRender] = useState(true);
   const [disableTransition, setDisableTransition] = useState(false);
@@ -215,21 +214,6 @@ export default function Chatbot() {
 
   const maxHeight = isBrowser ? window.innerHeight - 116 : 0;
 
-  useLayoutEffect(() => {
-    if (inputRef.current) {
-      const handleFocus = (e: FocusEvent) => {
-        e.preventDefault();
-      };
-
-      const inputElement = inputRef.current;
-      inputElement.addEventListener('focus', handleFocus, { passive: false });
-
-      return () => {
-        inputElement.removeEventListener('focus', handleFocus);
-      };
-    }
-  }, []);
-
   return (
     <div
       className={`fixed bottom-4 right-4 w-80 bg-background text-foreground border border-muted-background rounded-lg flex flex-col ${
@@ -305,7 +289,6 @@ export default function Chatbot() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            ref={inputRef}
             className={`rounded-l-full border bg-background text-foreground focus:outline-none focus:ring-orange-500 transition-all ease-in-out ${
               isCollapsed ? 'w-4/5' : 'flex-grow'
             }`}
